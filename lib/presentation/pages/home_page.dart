@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gemini_ai/presentation/widgets/answer_bubble.dart';
+import 'package:flutter_gemini_ai/utils/content_extentions.dart';
 
 import '../bloc/answer_bloc.dart';
 
@@ -13,7 +14,16 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ask Gemini!'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Ask Gemini!'),
+            IconButton(
+              onPressed: () => context.read<AnswerBloc>().add(const ResetAnswers()),
+              icon: const Icon(Icons.delete_forever),
+            ),
+          ],
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -21,17 +31,23 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                child: BlocBuilder<AnswerBloc, AnswerState>(
-                  builder: (context, state) {
-                    return switch (state) {
-                      AnswerInitial() => const SizedBox(),
-                      AnswerLoading(:final answer) => AnswerBubble(answer: answer),
-                      AnswerLoaded(:final answer) => AnswerBubble(answer: answer),
-                      AnswerError() => const Text('Error'),
-                    };
-                  },
-                ),
+              child: BlocBuilder<AnswerBloc, AnswerState>(
+                builder: (context, state) {
+                  switch (state) {
+                    case AnswerInitial():
+                      return const SizedBox();
+                    case AnswerError():
+                      return const Text('Error');
+                    case AnswerLoaded() || AnswerLoading():
+                      final answers = context.read<AnswerBloc>().chats.toAnswers();
+                      return ListView.builder(
+                        itemCount: answers.length,
+                        itemBuilder: (context, index) {
+                          return AnswerBubble(answer: answers[index]);
+                        },
+                      );
+                  }
+                },
               ),
             ),
             Container(
