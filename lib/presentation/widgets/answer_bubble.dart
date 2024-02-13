@@ -9,13 +9,12 @@ class AnswerBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        // crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _ChatBubble(text: answer.question),
-          const SizedBox(height: 8),
           switch (answer.answer) {
             null => const Center(
                 child: CircularProgressIndicator(),
@@ -36,14 +35,24 @@ class _ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      margin: (isUser) ? const EdgeInsets.only(left: 32) : const EdgeInsets.only(right: 32),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: (isUser) ? Colors.blueAccent : Colors.pinkAccent,
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Row(
+        mainAxisAlignment: (isUser) ? MainAxisAlignment.end : MainAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.8,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: (isUser) ? Colors.blueAccent : Colors.pinkAccent,
+            ),
+            child: Text(text, textAlign: (isUser) ? TextAlign.right : null),
+          ),
+        ],
       ),
-      child: Text(text, textAlign: (isUser) ? TextAlign.right : null),
     );
   }
 }

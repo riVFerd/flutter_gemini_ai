@@ -1,3 +1,4 @@
+import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:flutter_gemini_ai/data/models/answer_model.dart';
 
 import '../../domain/repositories/answer_repository.dart';
@@ -9,7 +10,7 @@ class AnswerRepositoryImpl implements AnswerRepository {
   AnswerRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<AnswerModel> getAnswer(String question) async {
-    return remoteDataSource.getAnswer(question);
+  Future<AnswerModel> getAnswer(List<Content> chats) async {
+    return remoteDataSource.getAnswer(chats);
   }
 }

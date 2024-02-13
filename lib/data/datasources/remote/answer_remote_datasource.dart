@@ -7,9 +7,12 @@ class AnswerRemoteDataSource {
 
   AnswerRemoteDataSource({required this.gemini});
 
-  Future<AnswerModel> getAnswer(String question) async {
-    final candidate = await gemini.text(question);
+  Future<AnswerModel> getAnswer(List<Content> chats) async {
+    final candidate = await gemini.chat(chats);
     final answerText = candidate?.output;
-    return AnswerModel(question: question, answer: answerText);
+    return AnswerModel(
+      question: chats.last.parts!.last.text!,
+      answer: answerText,
+    );
   }
 }

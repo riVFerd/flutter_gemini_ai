@@ -12,3 +12,10 @@ class GetAnswer extends AnswerEvent {
   @override
   List<Object> get props => [question];
 }
+
+class ResetAnswers extends AnswerEvent {
+  const ResetAnswers();
+
+  @override
+  List<Object> get props => [];
+}
