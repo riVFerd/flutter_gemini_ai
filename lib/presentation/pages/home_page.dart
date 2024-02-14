@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gemini_ai/presentation/widgets/answer_bubble.dart';
 import 'package:flutter_gemini_ai/utils/content_extentions.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../bloc/answer_bloc.dart';
 
@@ -11,6 +12,16 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final questionController = TextEditingController();
+    final listController = ScrollController();
+
+    Future<void> scrollDown() async {
+      await Future.delayed(const Duration(microseconds: 300));
+      listController.animateTo(
+        listController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
 
     void showDeleteDialog() {
       showDialog(
@@ -55,7 +66,7 @@ class HomePage extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -69,7 +80,9 @@ class HomePage extends StatelessWidget {
                       return Text(message);
                     case AnswerLoaded() || AnswerLoading():
                       final answers = context.read<AnswerBloc>().chats.toAnswers();
+                      scrollDown();
                       return ListView.builder(
+                        controller: listController,
                         itemCount: answers.length,
                         itemBuilder: (context, index) {
                           return AnswerBubble(answer: answers[index]);
@@ -92,14 +105,37 @@ class HomePage extends StatelessWidget {
                       controller: questionController,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      final question = questionController.text;
-                      if (question.isEmpty) return;
-                      context.read<AnswerBloc>().add(GetAnswer(question));
-                      questionController.clear();
+                  BlocBuilder<AnswerBloc, AnswerState>(
+                    builder: (context, state) {
+                      return Stack(
+                        children: [
+                          AnimatedOpacity(
+                            duration: const Duration(milliseconds: 300),
+                            opacity: state is AnswerLoading ? 1 : 0,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: LoadingAnimationWidget.waveDots(
+                                color: Colors.blueAccent,
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                          AnimatedPositioned(
+                            duration: const Duration(milliseconds: 300),
+                            right: state is AnswerLoading ? -40 : 0,
+                            child: IconButton(
+                              onPressed: () {
+                                final question = questionController.text;
+                                if (question.isEmpty) return;
+                                context.read<AnswerBloc>().add(GetAnswer(question));
+                                questionController.clear();
+                              },
+                              icon: const Icon(Icons.send, color: Colors.blueAccent),
+                            ),
+                          ),
+                        ],
+                      );
                     },
-                    icon: const Icon(Icons.send),
                   ),
                 ],
               ),
