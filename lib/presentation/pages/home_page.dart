@@ -12,6 +12,35 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final questionController = TextEditingController();
 
+    void showDeleteDialog() {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Delete all chats?'),
+              content: const Text('This action cannot be undone.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    context.read<AnswerBloc>().add(const ResetAnswers());
+                    Navigator.of(context).pop();
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.red,
+                  ),
+                  child: const Text('Delete', style: TextStyle(color: Colors.white)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+              ],
+            );
+          });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -19,7 +48,7 @@ class HomePage extends StatelessWidget {
           children: [
             const Text('Ask Gemini!'),
             IconButton(
-              onPressed: () => context.read<AnswerBloc>().add(const ResetAnswers()),
+              onPressed: showDeleteDialog,
               icon: const Icon(Icons.delete_forever),
             ),
           ],
@@ -36,8 +65,8 @@ class HomePage extends StatelessWidget {
                   switch (state) {
                     case AnswerInitial():
                       return const SizedBox();
-                    case AnswerError():
-                      return const Text('Error');
+                    case AnswerError(:final message):
+                      return Text(message);
                     case AnswerLoaded() || AnswerLoading():
                       final answers = context.read<AnswerBloc>().chats.toAnswers();
                       return ListView.builder(
@@ -66,6 +95,7 @@ class HomePage extends StatelessWidget {
                   IconButton(
                     onPressed: () {
                       final question = questionController.text;
+                      if (question.isEmpty) return;
                       context.read<AnswerBloc>().add(GetAnswer(question));
                       questionController.clear();
                     },
