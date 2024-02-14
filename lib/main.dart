@@ -20,7 +20,7 @@ void main() async {
         final answerRepository = AnswerRepositoryImpl(remoteDataSource: answerRemoteDataSource);
         return AnswerBloc(answerRepository);
       },
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Ask Gemini!',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
