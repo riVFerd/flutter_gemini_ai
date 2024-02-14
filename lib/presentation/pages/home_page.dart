@@ -16,8 +16,10 @@ class HomePage extends StatelessWidget {
 
     Future<void> scrollDown() async {
       await Future.delayed(const Duration(microseconds: 300));
-      listController.jumpTo(
+      listController.animateTo(
         listController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
       );
     }
 
@@ -128,7 +130,7 @@ class HomePage extends StatelessWidget {
                                 context.read<AnswerBloc>().add(GetAnswer(question));
                                 questionController.clear();
                               },
-                              icon: const Icon(Icons.send),
+                              icon: const Icon(Icons.send, color: Colors.blueAccent),
                             ),
                           ),
                         ],
